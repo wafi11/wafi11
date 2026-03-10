@@ -1,45 +1,24 @@
 import requests
+import os
 from datetime import datetime
 
-GITHUB_USERNAME = "wafi11" 
+GITHUB_USERNAME = "wafi11"
 
 def get_github_stats():
+    token = os.environ.get("GITHUB_TOKEN")  # ambil dari env
+    headers = {"Authorization": f"token {token}"} if token else {}
+    
     url = f"https://api.github.com/users/{GITHUB_USERNAME}"
-    res = requests.get(url).json()
+    res = requests.get(url, headers=headers)
+    data = res.json()
+
+    # Debug kalau masih error
+    if "public_repos" not in data:
+        print(f"API Response: {data}")
+        raise Exception(f"GitHub API error: {data.get('message', 'unknown')}")
+
     return {
-        "repos": res["public_repos"],
-        "followers": res["followers"],
-        "following": res["following"],
+        "repos": data["public_repos"],
+        "followers": data["followers"],
+        "following": data["following"],
     }
-
-def update_readme():
-    stats = get_github_stats()
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-
-    content = f"""
-| 📦 Repos | 👥 Followers | 🔁 Following |
-|----------|-------------|-------------|
-| {stats['repos']} | {stats['followers']} | {stats['following']} |
-
-> 🕐 Last updated: {now}
-"""
-
-    with open("README.md", "r") as f:
-        readme = f.read()
-
-    # Replace konten antara marker
-    import re
-    new_readme = re.sub(
-        r"<!-- GITHUB_STATS -->.*<!-- /GITHUB_STATS -->",
-        f"<!-- GITHUB_STATS -->{content}<!-- /GITHUB_STATS -->",
-        readme,
-        flags=re.DOTALL
-    )
-
-    with open("README.md", "w") as f:
-        f.write(new_readme)
-
-    print("README updated!")
-
-if __name__ == "__main__":
-    update_readme()
