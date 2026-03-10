@@ -69,11 +69,11 @@ def update_readme():
 > 🕐 Last updated: {now}
 """
 
-    if not os.path.exists("README.md"):
-        with open("README.md", "w") as f:
+    if not os.path.exists("readme.md"):
+        with open("readme.md", "w") as f:
             f.write("# Hi, I'm Wafi 👋\n\n<!-- GITHUB_STATS -->\n<!-- /GITHUB_STATS -->\n")
 
-    with open("README.md", "r") as f:
+    with open("readme.md", "r") as f:
         readme = f.read()
 
     new_readme = re.sub(
@@ -83,7 +83,7 @@ def update_readme():
         flags=re.DOTALL
     )
 
-    with open("README.md", "w") as f:
+    with open("readme.md", "w") as f:
         f.write(new_readme)
 
     print("README updated!")
